@@ -9,9 +9,9 @@ batch_size, max_seq_length = 1, 2048
 model_base = "/hy-tmp/"
 model_name = "Qwen2-1.5B-Instruct"
 model_save = model_base + model_name
-loopcnt = Connection to i-1.gpushare.com closed by remote host.
-Connection to i-1.gpushare.com closed.
-liyang@liyang-PC:~$ 
+loopcnt = 3
+cost_time_list = []
+GFLOPs_list = []
 GFLOPS_list = []
 
 model =  None
