@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$#" -ne 3 ] || [ "$1" != "cpu" ] && [ "$1" != "gpu" ]; then
-    echo "Usage: $0 [cpu|gpu]"
+    echo "Usage: $0 [cpu|gpu] $1 bacth_size $2 max_seq_length"
     exit 1
 fi
 
