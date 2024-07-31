@@ -1,3 +1,6 @@
+import sys
+import time
+import torch
 from transformers import AutoTokenizer
 
 from transformers import AutoModelForCausalLM
@@ -21,12 +24,12 @@ def restrict_gpu_upper_bound():
     torch.cuda.set_per_process_memory_fraction(memory_fraction, device=1)  # 例如，限制为 50%
 
 
-restrict_gpu_upper_bound()
+#restrict_gpu_upper_bound()
 
 batch_size, max_seq_length = int(sys.argv[1]), int(sys.argv[2])
 print(batch_size, max_seq_length)
 model_base = "/data/sonald/ai_models/model_weights/"
-model_name = "Qwen2-0.5B-Instruct"
+model_name = sys.argv[3]
 model_save = model_base + model_name
 
 model =  None
@@ -35,7 +38,7 @@ model =  None
 model = AutoModelForCausalLM.from_pretrained(model_save, torch_dtype=torch.bfloat16)
 #model = torch.compile(model)
 
-device = torch.device("cuda:1")
+device = torch.device("cuda:3")
 torch.cuda.set_device(device)
 torch.cuda.reset_max_memory_allocated(device)
 origin_bytes = torch.cuda.memory_allocated(device=device)
@@ -76,3 +79,6 @@ print(f'after:{memory_after/(1024**3)}')
 print(f'EvalMemoryUsage: {int(torch.cuda.max_memory_allocated())/(1024**3)} GB')
 #print(prof.key_averages().table(sort_by="flops", row_limit=10))
 print(int(torch.cuda.max_memory_allocated())/(1024**3))
+
+print(f'batch_size:{batch_size:} max_seq_length:{max_seq_length:}')
+print(f'model_name:{model_name}')
