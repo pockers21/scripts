@@ -14,7 +14,7 @@ from memory_profiler import profile
 
 
 model_base = "/data/sonald/ai_models/model_weights/"
-model_name = "Qwen2-0.5B-Instruct"
+model_name = sys.argv[3]
 model_save = model_base + model_name
 
 model =  None
@@ -48,6 +48,8 @@ def execute(batch_size, max_seq_length):
     memory_usage_gb = round(memory_info.rss / (1024 ** 3), 2)
     eval_list.append(memory_usage_gb)
     print(f"EvalMemoryUsage: {memory_usage_gb} GB")
+    print(f'batch_size:{batch_size:} max_seq_length:{max_seq_length:}')
+    print(f'model_name:{model_name}')
     del model
     del inputs
     gc.collect()
@@ -59,3 +61,4 @@ if __name__ == '__main__':
     execute(int(sys.argv[1]), int(sys.argv[2]))
     print(f'load_list:{load_list}')
     print(f'eval_list:{eval_list}')
+
