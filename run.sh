@@ -2,7 +2,7 @@
 
 # 检查传入的参数是否正确
 if [ "$#" -ne 3 ] || [ "$1" != "cpu" ] && [ "$1" != "gpu" ]; then
-    echo "Usage: $0 [cpu|gpu]"
+    echo "Usage: $0 [cpu|gpu] $1 batch_size $2 max_sequence_size"
     exit 1
 fi
 
