@@ -28,17 +28,17 @@ def restrict_gpu_upper_bound():
 
 batch_size, max_seq_length = int(sys.argv[1]), int(sys.argv[2])
 print(batch_size, max_seq_length)
-model_base = "/data/sonald/ai_models/model_weights/"
+model_base = "/hy-tmp/"
 model_name = sys.argv[3]
 model_save = model_base + model_name
 
 model =  None
 
 #model = AutoModelForCausalLM.from_pretrained(model_save,torch_dtype=torch.float32)
-model = AutoModelForCausalLM.from_pretrained(model_save, torch_dtype=torch.bfloat16)
+model = AutoModelForCausalLM.from_pretrained(model_save, torch_dtype=torch.bfloat16, trust_remote_code=True)
 #model = torch.compile(model)
 
-device = torch.device("cuda:3")
+device = torch.device("cuda:0")
 torch.cuda.set_device(device)
 torch.cuda.reset_max_memory_allocated(device)
 origin_bytes = torch.cuda.memory_allocated(device=device)
