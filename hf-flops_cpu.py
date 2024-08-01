@@ -13,7 +13,7 @@ from memory_profiler import profile
 
 
 
-model_base = "/data/sonald/ai_models/model_weights/"
+model_base = "/hy-tmp/"
 model_name = sys.argv[3]
 model_save = model_base + model_name
 
@@ -26,7 +26,7 @@ eval_list = []
 def execute(batch_size, max_seq_length):
     batch_size, max_seq_length = batch_size, max_seq_length
     print(batch_size, max_seq_length)
-    model = AutoModelForCausalLM.from_pretrained(model_save, torch_dtype=torch.bfloat16)
+    model = AutoModelForCausalLM.from_pretrained(model_save, torch_dtype=torch.bfloat16, trust_remote_code=True)
 
     device = torch.device("cpu")
     model = model.to(device)
@@ -61,4 +61,3 @@ if __name__ == '__main__':
     execute(int(sys.argv[1]), int(sys.argv[2]))
     print(f'load_list:{load_list}')
     print(f'eval_list:{eval_list}')
-
