@@ -59,13 +59,6 @@ inputs = torch.randint(1,15000,(batch_size, max_seq_length)).long().to(device)
 
 input_list = [inputs]
 
-profile_kwargs = ProfileKwargs(
-        #with_flops=True,
-        profile_memory=True,
-        activities=["cuda","cpu"],
-        #record_shapes=True
-)
-
 #accelerator = Accelerator(kwargs_handlers=[profile_kwargs])
 
 torch.cuda.reset_peak_memory_stats()
