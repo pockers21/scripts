@@ -37,9 +37,9 @@ data_set_path="${dataset_paths[$user_input]}"
 for i in {1..3}; do
     echo "Execution $i:"
     if [ "$1" == "cpu" ]; then
-        output=$(python hf-flops_cpu.py $2 $3 $data_set_path)
+        output=$(python hf_cpu.py $2 $3 $data_set_path)
     else
-        output=$(python hf-flops_gpu.py $2 $3 $data_set_path)
+        output=$(python hf_gpu.py $2 $3 $data_set_path)
     fi
     echo "$output"
     load_memory_usage=$(echo "$output" | grep -o -E "LoadMemoryUsage: [0-9.]+ GB" | awk '{print $2}')
