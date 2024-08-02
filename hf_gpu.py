@@ -33,24 +33,24 @@ model_name = sys.argv[3]
 model_save = model_base + model_name
 
 model =  None
+device = torch.device("cuda:0")
+origin_gbytes = torch.cuda.memory_allocated(device=device) /(1024**3)
+print(f'origin_gbytes:{origin_gbytes} GBytes')
 
 #model = AutoModelForCausalLM.from_pretrained(model_save,torch_dtype=torch.float32)
 model = AutoModelForCausalLM.from_pretrained(model_save, torch_dtype=torch.bfloat16, trust_remote_code=True)
 #model = torch.compile(model)
 
-device = torch.device("cuda:0")
+
 torch.cuda.set_device(device)
 torch.cuda.reset_max_memory_allocated(device)
-origin_bytes = torch.cuda.memory_allocated(device=device)
-print(f'origin_bytes:{int(origin_bytes)/1024/1024/1024}')
+
 model = model.to(device)
 
-load_bytes = torch.cuda.memory_allocated(device=device)
-load_bytes = (int(load_bytes))/(1024 ** 3)
+loaded_gbytes = int(torch.cuda.memory_allocated(device=device))/(1024**3)
+loaded_gbytes -= origin_gbytes
 
-
-
-print(f'LoadMemoryUsage: {load_bytes} GB')
+print(f'LoadMemoryUsage: {loaded_gbytes} GB')
 
 model = model.eval()
 print(model.dtype)
@@ -69,14 +69,14 @@ profile_kwargs = ProfileKwargs(
 #accelerator = Accelerator(kwargs_handlers=[profile_kwargs])
 
 torch.cuda.reset_peak_memory_stats()
-memory_before = torch.cuda.memory_allocated()
+#memory_before = torch.cuda.memory_allocated()
 model(inputs)
-memory_after = torch.cuda.memory_allocated()
-memory_usage = (memory_after - memory_before) / (1024 ** 3)  # in MB
-print(f'before:{memory_before/(1024**3)}')
-print(f'after:{memory_after/(1024**3)}')
-#print(f'memory_usage:{memory_usage}')
-print(f'EvalMemoryUsage: {int(torch.cuda.max_memory_allocated())/(1024**3)} GB')
+#memory_after = torch.cuda.memory_allocated()
+#memory_usage = (memory_after - memory_before) / (1024 ** 3)  # in MB
+#print(f'before:{memory_before/(1024**3)}')
+#print(f'after:{memory_after/(1024**3)}')
+max_memory_allocated = int(torch.cuda.max_memory_allocated())/(1024**3) - origin_gbytes
+print(f'EvalMemoryUsage: {max_memory_allocated} GB')
 #print(prof.key_averages().table(sort_by="flops", row_limit=10))
 print(int(torch.cuda.max_memory_allocated())/(1024**3))
 
