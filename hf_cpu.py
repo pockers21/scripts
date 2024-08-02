@@ -26,6 +26,11 @@ eval_list = []
 def execute(batch_size, max_seq_length):
     batch_size, max_seq_length = batch_size, max_seq_length
     print(batch_size, max_seq_length)
+    process = psutil.Process(os.getpid())
+    memory_info = process.memory_info()
+    origin_memory_usage_gb = round(memory_info.rss / (1024 ** 3), 2)
+    origin_memory_usage_gb = 0
+    print(f'origin_memory_usage_gb:{origin_memory_usage_gb}')
     model = AutoModelForCausalLM.from_pretrained(model_save, torch_dtype=torch.bfloat16, trust_remote_code=True)
 
     device = torch.device("cpu")
@@ -36,16 +41,18 @@ def execute(batch_size, max_seq_length):
 
     inputs = torch.randint(1,15000,(batch_size, max_seq_length)).long().to(device)
 
-    #accelerator = Accelerator(kwargs_handlers=[profile_kwargs])
-
-    process = psutil.Process(os.getpid())
     memory_info = process.memory_info()
     memory_usage_gb = round(memory_info.rss / (1024 ** 3), 2)
+    print(f'memory_usage_gb:{memory_usage_gb}')
+    memory_usage_gb -= origin_memory_usage_gb
     load_list.append(memory_usage_gb)
     print(f"LoadMemoryUsage: {memory_usage_gb} GB")
     model(inputs)
+
     memory_info = process.memory_info()
     memory_usage_gb = round(memory_info.rss / (1024 ** 3), 2)
+    print(f'memory_usage_gb:{memory_usage_gb}')
+    memory_usage_gb -= origin_memory_usage_gb
     eval_list.append(memory_usage_gb)
     print(f"EvalMemoryUsage: {memory_usage_gb} GB")
     print(f'batch_size:{batch_size:} max_seq_length:{max_seq_length:}')
