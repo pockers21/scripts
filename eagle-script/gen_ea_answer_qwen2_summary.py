@@ -19,8 +19,7 @@ from tqdm import tqdm
 from model.ea_model import EaModel
 from model.kv_cache import initialize_past_key_values
 from model.utils import *
-
-
+from evaluation.test import load_datasets
 
 def run_eval(
         base_model_path,
@@ -294,7 +293,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--load-in-8bit", action="store_false", help="Use 8-bit quantization"
     )
-    parser.add_argument("--model-id", type=str, default="ess-llama-2-chat-70b-fp16")
+    parser.add_argument("--model-id", type=str, default="ess-qwen2-70b-fp16")
     parser.add_argument(
         "--bench-name",
         type=str,
