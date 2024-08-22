@@ -12,20 +12,19 @@ parent_dir = os.path.dirname(script_dir)
 import time
 
 import shortuuid
-from fastchat.llm_judge.common import load_questions
 from fastchat.model import get_conversation_template
 from tqdm import tqdm
 
 from model.ea_model import EaModel
 from model.kv_cache import initialize_past_key_values
 from model.utils import *
-from evaluation.test import load_datasets
+from evaluation.test.load_datasets import load_summary_datasets
 
 def run_eval(
         base_model_path,
         ea_model_path,
         model_id,
-        question_file,
+        dataset,
         question_begin,
         question_end,
         answer_file,
@@ -37,10 +36,10 @@ def run_eval(
         temperature,
         args
 ):
-    questions = load_questions(question_file, question_begin, question_end)
+    dataset = load_summary_datasets(dataset)
     # random shuffle the questions to balance the loading
     # random.shuffle(questions)
-    shuffled_ids = [q["question_id"] for q in questions]
+    shuffled_ids = [q["question_id"] for q in dataset]
     # with open(f"data/{args.bench_name}/model_ids/{args.model_id}.shuffled_ids", "w") as fout:
     #     json.dump(shuffled_ids, fout)
 
@@ -55,15 +54,15 @@ def run_eval(
     else:
         get_answers_func = get_model_answers
 
-    chunk_size = len(questions) // (num_gpus_total // num_gpus_per_model)  # // 2
+    chunk_size = len(dataset) // (num_gpus_total // num_gpus_per_model)  # // 2
     ans_handles = []
-    for i in range(0, len(questions), chunk_size):
+    for i in range(0, len(dataset), chunk_size):
         ans_handles.append(
             get_answers_func(
                 base_model_path,
                 ea_model_path,
                 model_id,
-                questions[i: i + chunk_size],
+                dataset[i: i + chunk_size],
                 answer_file,
                 max_new_token,
                 num_choices,
@@ -364,6 +363,12 @@ if __name__ == "__main__":
         default="mc_sim_7b_63",
     )
 
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default="",
+    )
+
     args = parser.parse_args()
 
     args.model_id = args.model_id + "-temperature-" + str(args.temperature)
@@ -372,7 +377,6 @@ if __name__ == "__main__":
 
         ray.init()
 
-    question_file = f"{parent_dir}/data/{args.bench_name}/question.jsonl"
     if args.answer_file:
         answer_file = args.answer_file
     else:
@@ -384,7 +388,7 @@ if __name__ == "__main__":
         args.base_model_path,
         args.ea_model_path,
         args.model_id,
-        question_file,
+        args.dataset,
         args.question_begin,
         args.question_end,
         answer_file,
