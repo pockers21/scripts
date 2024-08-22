@@ -7,6 +7,7 @@ from transformers import AutoModelForCausalLM
 from accelerate import Accelerator, ProfileKwargs
 from torch.profiler import profile, record_function, ProfilerActivity
 
+
 def restrict_gpu_upper_bound():
     memory_fraction = 0.3  # 例如，设置为 50%
 
@@ -25,6 +26,7 @@ def restrict_gpu_upper_bound():
 
 
 #restrict_gpu_upper_bound()
+
 
 batch_size, max_seq_length = int(sys.argv[1]), int(sys.argv[2])
 print(batch_size, max_seq_length)
@@ -68,7 +70,7 @@ model(inputs)
 #memory_usage = (memory_after - memory_before) / (1024 ** 3)  # in MB
 #print(f'before:{memory_before/(1024**3)}')
 #print(f'after:{memory_after/(1024**3)}')
-max_memory_allocated = int(torch.cuda.max_memory_allocated())/(1024**3) - origin_gbytes
+max_memory_allocated = int(torch.cuda.max_memory_allocated())/(1024**3) - origin_gbytes 
 print(f'EvalMemoryUsage: {max_memory_allocated} GB')
 #print(prof.key_averages().table(sort_by="flops", row_limit=10))
 print(int(torch.cuda.max_memory_allocated())/(1024**3))
